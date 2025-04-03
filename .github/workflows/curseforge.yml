@@ -2,6 +2,11 @@ name: "Generate Curseforge modpack"
 on:
   pull_request:
   push:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag name for release"
+        required: true
 jobs:
   curseforge:
     runs-on: ubuntu-latest
@@ -17,3 +22,35 @@ jobs:
         name: GregTech Odyssey
         path: |
           ./result/**.zip
+  
+  publish:
+    needs: [curseforge]
+    runs-on: ubuntu-latest
+    env:
+      GH_REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+    permissions:
+      contents: write
+    steps:
+      - if: github.event_name == 'workflow_dispatch'
+        run: echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+      - if: github.event_name == 'push'
+        run: |
+          echo "TAG_NAME=nightly" >> $GITHUB_ENV
+      - if: env.TAG_NAME == 'nightly'
+        run: |
+          (echo 'SUBJECT=Gregtech Odyssey nightly release $(echo "${{ github.sha }}" | cut -c 1-7)';
+           echo 'PRERELEASE=--prerelease') >> $GITHUB_ENV
+          gh release delete nightly --yes || true
+          git push origin :nightly || true
+      - if: env.TAG_NAME != 'nightly'
+        run: |
+          (echo 'SUBJECT=Gregtech Odyssey release';
+           echo 'PRERELEASE=') >> $GITHUB_ENV
+          git push origin :$TAG_NAME || true 
+      - name: Publish release
+        run: |
+          gh release create $TAG_NAME $PRERELEASE --title "$SUBJECT" --target $GITHUB_SHA result/*
+          if [ "$TAG_NAME" != "nightly" ]; then
+            gh release create $TAG_NAME $PRERELEASE --title "$SUBJECT" --target $GITHUB_SHA result/*
+          fi
