@@ -35,17 +35,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
       - if: github.event_name == 'workflow_dispatch'
+        name: Generate tag name
         run: echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
       - if: github.event_name == 'push'
+        name: Generate tag name
         run: |
           echo "TAG_NAME=nightly" >> $GITHUB_ENV
       - if: env.TAG_NAME == 'nightly'
-        run: |
-          echo 'SUBJECT=Gregtech Odyssey nightly release $(echo $GITHUB_SHA | cut -c 1-7)' >> $GITHUB_ENV
+        name: Create tag
+        run: | 
+          echo "SUBJECT=Gregtech Odyssey nightly release $(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
           echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
           gh release delete nightly --yes || true
           git push origin :nightly || true
       - if: env.TAG_NAME != 'nightly'
+        name: Create tag
         run: |
           (echo 'SUBJECT=Gregtech Odyssey release';
            echo 'PRERELEASE=') >> $GITHUB_ENV
