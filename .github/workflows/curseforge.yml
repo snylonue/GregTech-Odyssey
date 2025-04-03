@@ -44,14 +44,14 @@ jobs:
       - if: env.TAG_NAME == 'nightly'
         name: Create tag
         run: | 
-          echo "SUBJECT=Gregtech Odyssey nightly release $(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
+          echo "SUBJECT=Gregtech Odyssey Nightly Release $(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
           echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
           gh release delete nightly --yes || true
           git push origin :nightly || true
       - if: env.TAG_NAME != 'nightly'
         name: Create tag
         run: |
-          (echo 'SUBJECT=Gregtech Odyssey release';
+          (echo 'SUBJECT=Gregtech Odyssey Release';
            echo 'PRERELEASE=') >> $GITHUB_ENV
           git push origin :$TAG_NAME || true 
       - name: Publish release
