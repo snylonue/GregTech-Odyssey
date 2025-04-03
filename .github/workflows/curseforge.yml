@@ -41,8 +41,8 @@ jobs:
           echo "TAG_NAME=nightly" >> $GITHUB_ENV
       - if: env.TAG_NAME == 'nightly'
         run: |
-          (echo 'SUBJECT=Gregtech Odyssey nightly release $(echo "${{ github.sha }}" | cut -c 1-7)';
-           echo 'PRERELEASE=--prerelease') >> $GITHUB_ENV
+          echo 'SUBJECT=Gregtech Odyssey nightly release $(echo $GITHUB_SHA | cut -c 1-7)' >> $GITHUB_ENV
+          echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
           gh release delete nightly --yes || true
           git push origin :nightly || true
       - if: env.TAG_NAME != 'nightly'
