@@ -34,7 +34,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
-      - run: unzip "GregTech Odyssey.zip"
       - if: github.event_name == 'workflow_dispatch'
         run: echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
       - if: github.event_name == 'push'
@@ -53,7 +52,7 @@ jobs:
           git push origin :$TAG_NAME || true 
       - name: Publish release
         run: |
-          gh release create $TAG_NAME $PRERELEASE --title "$SUBJECT" --target $GITHUB_SHA "GregTech Odyssey-*.zip"
+          gh release create $TAG_NAME $PRERELEASE --title "$SUBJECT" --target $GITHUB_SHA "GregTech Odyssey/*"
           if [ "$TAG_NAME" != "nightly" ]; then
-            gh release create $TAG_NAME $PRERELEASE --title "$SUBJECT" --target $GITHUB_SHA "GregTech Odyssey-*.zip"
+            gh release create $TAG_NAME $PRERELEASE --title "$SUBJECT" --target $GITHUB_SHA "GregTech Odyssey/*"
           fi
