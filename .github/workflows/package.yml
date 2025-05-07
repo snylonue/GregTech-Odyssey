@@ -1,8 +1,8 @@
 name: "Package"
 on:
   push:
-    branches:
-      - main
+    # branches:
+      # - main
   workflow_dispatch:
     inputs:
       tag_name:
@@ -11,6 +11,9 @@ on:
 jobs:
   package:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
     steps:
     - uses: actions/checkout@v4
     - uses: nixbuild/nix-quick-install-action@v30
